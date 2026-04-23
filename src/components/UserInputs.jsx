@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -10,13 +10,20 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import jobTypes from "../assets/jobRole.json";
+import skillJSON from '../assets/jobSkills.json';
+import summaryJSON from '../assets/summaries.json'
+import { addResumeAPI } from '../services/allResumeApiService';
+import { useNavigate } from 'react-router-dom';
 
 const steps = ['Basic Information', 'Contact Details', 'Educational Details', 'Skills And Summary'];
 
-function UserInputs() {
+function UserInputs({resumeData,setResumeData}) {
  const [activeStep, setActiveStep] = React.useState(0);
-
-
+ const navigate = useNavigate()
+ 
+ console.log(resumeData);
+ 
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -26,22 +33,33 @@ function UserInputs() {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
+  const generateAI =()=>{
+    setResumeData({...resumeData,
+      skills:skillJSON[resumeData.job],
+      summary:summaryJSON[resumeData.job]})
+      handleNext()
+  }
+
   const renderStepContent =(stepCount)=>{
     switch(stepCount){
         case 0 : return(
             <div>
                 <h3>Personal Details</h3>
                 <div className='p-3 row'>
-                      <TextField id="standard-basic-name" label="Full Name" variant="standard" />
-                      <TextField id="standard-basic-location" label="Location" variant="standard" />
+                      <TextField value={resumeData.fullName} onChange={e=>setResumeData({...resumeData,fullName:e.target.value})} id="standard-basic-name" label="Full Name" variant="standard" />
+                      <TextField value={resumeData.location} onChange={e=>setResumeData({...resumeData,location:e.target.value})} id="standard-basic-location" label="Location" variant="standard" />
                       <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-                        <InputLabel id="demo-simple-select-standard-label">Job Role</InputLabel>
-                        <Select
+                        <InputLabel id="demo-simple-select-standard-label">Choose Job Role</InputLabel>
+                        <Select onChange={e=>setResumeData({...resumeData,job:e.target.value})}
                         labelId="demo-simple-select-standard-label"
                         id="demo-simple-select-standard"
-                        label="Role"
+                        label="Job"
                         >
-                        <MenuItem value={10}>Ten</MenuItem>
+                        {
+                          jobTypes.jobRoles.map(role=>(
+                            <MenuItem key={role} value={role}>{role}</MenuItem>
+                          ))
+                        }
                         </Select>
                       </FormControl>
                 </div>
@@ -51,10 +69,10 @@ function UserInputs() {
             <div>
                 <h3>Contact Details</h3>
                 <div className='p-3 row'>
-                      <TextField id="standard-basic-email" label="Email" variant="standard" />
-                      <TextField id="standard-basic-phone" label="Contact number" variant="standard" />
-                      <TextField id="standard-basic-linkedin" label="LinkedIn Link" variant="standard" />
-                      <TextField id="standard-basic-github" label="Github Link" variant="standard" />
+                      <TextField value={resumeData.email} onChange={e=>setResumeData({...resumeData,email:e.target.value})}  id="standard-basic-email" label="Email" variant="standard" />
+                      <TextField value={resumeData.phone} onChange={e=>setResumeData({...resumeData,phone:e.target.value})}  id="standard-basic-phone" label="Contact number" variant="standard" />
+                      <TextField value={resumeData.linkedin} onChange={e=>setResumeData({...resumeData,linkedin:e.target.value})}  id="standard-basic-linkedin" label="LinkedIn Link" variant="standard" />
+                      <TextField value={resumeData.github} onChange={e=>setResumeData({...resumeData,github:e.target.value})}  id="standard-basic-github" label="Github Link" variant="standard" />
                 </div>
             </div>
         )
@@ -62,9 +80,9 @@ function UserInputs() {
             <div>
                 <h3>Educational Details</h3>
                 <div className='p-3 row'>
-                      <TextField id="standard-basic-degree" label="Bachelor's Degree" variant="standard" />
-                      <TextField id="standard-basic-college" label="University/College Name" variant="standard" />
-                      <TextField id="standard-basic-year" label="Year of Graduation" variant="standard" />
+                      <TextField value={resumeData.degree} onChange={e=>setResumeData({...resumeData,degree:e.target.value})}  id="standard-basic-degree" label="Bachelor's Degree" variant="standard" />
+                      <TextField value={resumeData.university} onChange={e=>setResumeData({...resumeData,university:e.target.value})}  id="standard-basic-college" label="University/College Name" variant="standard" />
+                      <TextField value={resumeData.passOut} onChange={e=>setResumeData({...resumeData,passOut:e.target.value})}  id="standard-basic-year" label="Year of Graduation" variant="standard" />
                 </div>
             </div>
         )
@@ -76,6 +94,23 @@ function UserInputs() {
         default: return null
     }
 
+  }
+
+  const handleAddResume = async ()=>{
+    const {fullName,location,job,email,phone,linkedin,github,degree,university,passOut,skills,summary} = resumeData
+    if(fullName && location && job && email && phone && linkedin && github && degree && university && passOut &&skills.length>0 && summary){
+      // api call
+      const response = await addResumeAPI(resumeData)
+      console.log(response);
+      if(response.status==201){
+        alert("Resume Added Successfully!!!")
+        const resumeId = response.data.id
+        navigate(`/resume/${resumeId}/view`)
+      }
+      
+    }else{
+      alert("Please fill the form completly")
+    }
   }
 
   return (
@@ -100,7 +135,7 @@ function UserInputs() {
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
             <Box sx={{ flex: '1 1 auto' }} />
-            <Button onClick={handleReset}>Reset</Button>
+            <Button onClick={handleAddResume}>Finish</Button>
           </Box>
         </React.Fragment>
       ) : (
@@ -124,8 +159,9 @@ function UserInputs() {
             <Box sx={{ flex: '1 1 auto' }} />
             
               {activeStep === steps.length - 1 ? 
-              <Button > Generate AI Skills & Summary   </Button>
+              <Button onClick={generateAI} > Generate AI Skills & Summary   </Button>
                : 
+               
               <Button onClick={handleNext}>Next  </Button>
               }
           

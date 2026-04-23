@@ -3,27 +3,31 @@ import Divider from '@mui/material/Divider';
 import { Box, Button } from '@mui/material';
 
 
-function Preview() {
+function Preview({resumeData}) {
   return (
     <div className='p-5 m-5 w-100 border border-shadow'>
-      <h2>FullName</h2>
-      <p className='fs-6'>Phone:232342342</p>
-      <p className='fs-6'>Email:mail</p>
-      <p className='fs-6'>LinkedIn: <a href="">URL</a></p>
-      <p className='fs-6'>GIthub: <a href="">URL</a> </p>
-      <p className='fs-6'>Location: location</p>
+      <h2>{resumeData?.fullName}</h2>
+      <p className='fs-6'>Phone:{resumeData?.phone}</p>
+      <p className='fs-6'>Email:{resumeData?.email}</p>
+      <p className='fs-6'>LinkedIn: <a href={resumeData?.linkedin}>{resumeData?.linkedin}</a></p>
+      <p className='fs-6'>GIthub: <a href={resumeData?.github}>{resumeData?.github}</a> </p>
+      <p className='fs-6'>Location: {resumeData?.location}</p>
       <Divider className='bg-dark my-3' />
       <h4 className='mt-3'>Professional Summary</h4>
-      <p>summary</p>
+      <p>{resumeData?.summary}</p>
       <Divider className='bg-dark my-3' />
       <h4 className='mt-3'>Technical Skills</h4>
       {/* duplicate user skill */}
-      <Button variant="outlined">Skill</Button>
+      {
+        resumeData?.skills?.map((item,index)=>(
+          <Button className='m-2 ' key={index} variant="outlined">{item}</Button>
+        ))
+      }
       <Divider className='bg-dark my-3' />
       <h4>Education</h4>
-      <p className='fs-6'>Bachelor's Degree in <b>degree</b></p>
-      <p className='fs-6'>University/College name</p>
-      <p className='fs-6'>Year of Graduation</p>
+      <p className='fs-6'>Bachelor's Degree in <b>{resumeData?.degree}</b></p>
+      <p className='fs-6'>University/College : {resumeData?.university}</p>
+      <p className='fs-6'>Year of Graduation : {resumeData?.passOut}</p>
       <Divider className='bg-dark my-3' />
     </div>
   )

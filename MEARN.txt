@@ -620,6 +620,23 @@ CSS - Cascading style Sheet
             2. All component need to setup path/url should inside "Routes" component, it should define in App component.
             3. Inorder to setup path for a component use "Route" component
                 syntax: <Route path='/url' element={<componentSelector/>}
+        - Navigation Links are created with <Link> or <NavLink>, which prevent full-page refreshing and mantain client-side performance.
+        - useParams() -   Hook used to get dynamic value associated in a URL/path, return object of key-value pair of the dynamic params from the current URL that were matched by the routes.
+        - useNavigate() - To redirect from component using hooks, Returns a function that lets you to navigate programatically in browser in response to user interactioms or effects.
+
+    23. API call in React
+        - Using Fetch method
+        - Using Axios Library: Make XMLHttpRequest from the browser, Axios is a promise-based HTTP Client for node.js and the browser.
+            - install axios: npm install axios
+            - Axios Instance is a custom axios object created with predefined configuration like baseURL,headers,timeout etc...
+                - Creating Axios Instance : axios.create(configuration)
+            - Axios  Interceptors are functions that allow you to intercept requests or response before they are handled by then() or catch(). 
+                -Types of axios Interceptors :
+                    1. Request Interceptor :  runs before request is sent to server
+                    2. Response Interceptor : runs before response reaches application.
+        
+    24. Data Sharing techniques 
+        - State Lifting : State will be lifted to a common parent so parent share data using props between chil components.
 
         
 
